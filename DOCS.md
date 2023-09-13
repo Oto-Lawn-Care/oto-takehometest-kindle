@@ -76,7 +76,6 @@ http://localhost:5000/
   - `data` (Request Body): JSON object containing book details.
 
 ```
-
 {
 "author": "Leo Tolstoy",
 "country": "Russia",
