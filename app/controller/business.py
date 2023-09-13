@@ -12,6 +12,20 @@ ALLOWED_KEYS = [
     "last_read_date",
 ]
 
+REQUIRED_KEYS = [
+    "author",
+    "country",
+    "imageLink",
+    "language",
+    "link",
+    "pages",
+    "title",
+    "year",
+    "last_read_page",
+    "percentage_read",
+    "last_read_date",
+]
+
 
 class BookNotFoundError(Exception):
     """Raised when a book is not found."""
@@ -37,6 +51,28 @@ def validate_keys(target) -> None:
         raise ValidationError(
             f"Invalid target. Allowed keys for searching are {', '.join(ALLOWED_KEYS)}."
         )
+
+
+def validate_json(json_data) -> None:
+    if not json_data:
+        raise ValidationError("JSON data is None.")
+
+    json_keys = set(json_data.keys())
+    required_keys_set = set(REQUIRED_KEYS)
+
+    if json_keys != required_keys_set:
+        missing_keys = required_keys_set - json_keys
+        extra_keys = json_keys - required_keys_set
+
+        error_messages = []
+
+        if missing_keys:
+            error_messages.append(f"Missing keys: {', '.join(missing_keys)}")
+
+        if extra_keys:
+            error_messages.append(f"Extra keys: {', '.join(extra_keys)}")
+
+        raise ValidationError(f"Invalid JSON. {' '.join(error_messages)}")
 
 
 # Define a function to list all the books from a library.
@@ -77,10 +113,12 @@ def add_book_user(
 
 
 # Define a function to add a book to a user's library.
-def add_book_global(data: str, global_library_path: str) -> dict:
+def add_book_global(json: str, global_library_path: str) -> dict:
+    validate_json(json)
     global_library_instance = kindle_model.Library(global_library_path)
-    new_book = kindle_model.Book(**data)
+    new_book = kindle_model.Book(**json)
     global_library_instance.add_book(new_book)
+
     return {"status": "success", "book added": new_book.to_dict()}
 
 

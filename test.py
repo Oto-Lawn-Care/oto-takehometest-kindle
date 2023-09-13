@@ -16,9 +16,37 @@ class BookRoutesTestCase(unittest.TestCase):
             return parsed_data.get("data", parsed_data)
         return parsed_data
 
+    mock_data1 = {
+        "author": "Test",
+        "country": "Test",
+        "imageLink": "Test",
+        "language": "Test",
+        "link": "Test",
+        "pages": 864,
+        "title": "Test",
+        "year": 1877,
+        "last_read_page": 0,
+        "percentage_read": 0.0,
+        "last_read_date": 0.0,
+    }
+    mock_data2 = {
+        "country": "Test",
+        "imageLink": "Test",
+        "language": "Test",
+        "link": "Test",
+        "pages": 864,
+        "title": "Test",
+        "year": 1877,
+        "last_read_page": 0,
+        "percentage_read": 0.0,
+        "last_read_date": 0.0,
+    }
+
     @parameterized.expand(
         [
             ("GET", "/global/books", 200, list),
+            ("POST", "/global/books", 200, dict, mock_data1),
+            ("POST", "/global/books", 400, dict, mock_data2),
             ("GET", "/global/books/search/title/Oedipus the King", 200, list),
             ("GET", "/global/books/search/title/Oedipus the King/author", 200, list),
             ("GET", "/global/books/search/test/test", 400, dict),
@@ -60,46 +88,29 @@ class BookRoutesTestCase(unittest.TestCase):
         ]
     )
     def test_endpoint_responses(
-        self, request_type, endpoint, expected_status, expected_type
+        self, request_type, endpoint, expected_status, expected_type, mock_data=None
     ):
         with self.subTest(endpoint=endpoint):
             if request_type == "GET":
                 response = self.client.get(endpoint)
             elif request_type == "PATCH":
                 response = self.client.patch(endpoint)
-            elif request_type == "PUT":
-                response = self.client.put(endpoint)
             elif request_type == "POST":
-                response = self.client.post(endpoint)
+                response = self.client.post(endpoint, json=mock_data)
             elif request_type == "DELETE":
                 response = self.client.delete(endpoint)
-            print(f"Endpoint: {endpoint}, Status Code: {response.status_code}")
-            self.assertEqual(response.status_code, expected_status)
+
+            success_message = f"Endpoint: {endpoint}, Status Code: {response.status_code} - Test PASSED"
+            fail_message = f"Endpoint: {endpoint}, Status Code: {response.status_code} - Expected: {expected_status}"
+
+            self.assertEqual(response.status_code, expected_status, fail_message)
+            print(success_message)
 
             if request_type == "DELETE" and expected_status == 204:
                 return
 
             data = self.extract_data(response)
             self.assertIsInstance(data, expected_type)
-
-    def test_add_book_to_global_library_success(self):
-        mock_data = {
-            "author": "Test",
-            "country": "Test",
-            "imageLink": "Test",
-            "language": "Test",
-            "link": "Test",
-            "pages": 864,
-            "title": "Test",
-            "year": 1877,
-            "last_read_page": 0,
-            "percentage_read": 0.0,
-            "last_read_date": 0.0,
-        }
-        response = self.client.post("/global/books", json=mock_data)
-        self.assertEqual(response.status_code, 200)
-        data = self.extract_data(response)
-        self.assertEqual(data["status"], "success")
 
 
 if __name__ == "__main__":

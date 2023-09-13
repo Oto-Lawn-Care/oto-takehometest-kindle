@@ -97,8 +97,8 @@ def add_book_to_user_library(uuid: str) -> Any:
 @book_routes.route("/global/books", methods=["POST"])
 def add_book_to_global_library() -> Any:
     try:
-        data = request.get_json()
-        response = add_book_global(data, global_json)
+        json = request.get_json()
+        response = add_book_global(json, global_json)
         return format_response(response)
     except ValidationError as ve:
         return {"error": str(ve)}, 400
