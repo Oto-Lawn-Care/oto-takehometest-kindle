@@ -1,5 +1,4 @@
 # oto-takehometest-kindle
-
 ### Take home coding test - Kindle backend
 
 Thank you for chosing to interview with OtO! Below are the instructions for your take home coding test:
