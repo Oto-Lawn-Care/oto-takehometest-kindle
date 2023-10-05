@@ -17,6 +17,21 @@ def client(app):
 
 
 @pytest.fixture
+def mock_book():
+    return Book(
+        book_id=0,
+        author='Sheldon Allen',
+        country='Canada',
+        image_link='https://google.com/',
+        language='English',
+        link='https://shelsoloa.com/',
+        pages=100,
+        title='Mock Book',
+        year=2023,
+    )
+
+
+@pytest.fixture
 def mock_global_library():
     return [{
         'id': 0,
