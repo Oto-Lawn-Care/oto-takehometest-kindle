@@ -9,18 +9,23 @@ from .exceptions import UserDoesNotOwnBookException
 
 
 def _retrieve_global_library():
-    with open(current_app.config.GLOBAL_LIBRARY_PATH, 'r') as global_library_f:
+    with open(current_app.config['GLOBAL_LIBRARY_PATH'], 'r') as global_library_f:
         return json.load(global_library_f)
 
 
 def _retrieve_user_library():
-    with open(current_app.config.USER_LIBRARY_PATH, 'r') as user_library_f:
-        return json.load(user_library_f)
+    with open(current_app.config['USER_LIBRARY_PATH'], 'r') as user_library_f:
+        try:
+            return json.load(user_library_f)
+
+        # this means the library is empty
+        except json.decoder.JSONDecodeError:
+            return []
 
 
 def _save_user_library(new_user_library):
-    with open(current_app.config.USER_LIBRARY_PATH, 'w') as user_library_f:
-        json.dump(new_user_library, user_library_f)
+    with open(current_app.config['USER_LIBRARY_PATH'], 'w') as user_library_f:
+        json.dump(new_user_library, user_library_f, indent=2)
 
 
 def retrieve_book_from_global_library(book_id: int):

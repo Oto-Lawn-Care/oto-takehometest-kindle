@@ -1,5 +1,3 @@
-import copy
-
 from app.controller.data import retrieve_book_from_global_library
 from app.controller.data import retrieve_user_book
 from app.controller.data import retrieve_last_accessed_user_book
